@@ -1,0 +1,1 @@
+feistel.o: feistel.c
