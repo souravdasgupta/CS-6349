@@ -2,7 +2,7 @@
 /*
  * generate_auth_key(): Generates authentication key from the master session key
  * @master: Pointer to the buffer containing the master key
- * @auth_key: Uninitialized pointer to store the new key (must be freed by the caller)
+ * @auth_key: Uninitialized pointer to store the new key (TODO: must be freed by the caller)
  */
 int generate_auth_key(unsigned char *master, unsigned char **auth_key) {
         
@@ -36,7 +36,7 @@ int generate_auth_key(unsigned char *master, unsigned char **auth_key) {
 /*
  * generate_integrity_key(): Generates integrity key from the master session key
  * @master: Pointer to the buffer containing the master key
- * @integrity_key: Uninitialized pointer to store the new key (must be freed by the caller)
+ * @integrity_key: Uninitialized pointer to store the new key (TODO: must be freed by the caller)
  */
 int generate_integrity_key(unsigned char *master, unsigned char **integrity_key) {
         int i , max, byte, carry = 0;
