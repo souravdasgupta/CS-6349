@@ -6,7 +6,8 @@ static unsigned int rnd_mask[] = {134, 19051, 6604, 20439};
  * calc_secure_hash(): Calculates the SHA256 message digest of the data
  * @data: Data whose hash we need to calculate
  * @size: size of the data
- * @digest: Uninitialized pointer to the digest
+ * @digest: Pointer to the buffer which will store the digest
+ * @key: Pointer to the buffer containing the key.
  */
 void calc_secure_hash(unsigned char *data, size_t size, unsigned char *digest, unsigned char *key) {
         unsigned char *data_with_secret;
@@ -22,7 +23,7 @@ void calc_secure_hash(unsigned char *data, size_t size, unsigned char *digest, u
  * get_round_key(): Generates round keys from the encryption key for each round
  * @key: Pointer to a buffer containing the actual encryption key 
  * @rnd: Round number
- * @rndkey: Uninitialized pointer to store the address of the generated round key
+ * @rndkey: Pointer to store the address of the generated round key
  */
 void get_round_key(unsigned char *key,  int rnd, unsigned char *rndkey){
         unsigned int *tkey, i;
@@ -50,7 +51,7 @@ void get_round_key(unsigned char *key,  int rnd, unsigned char *rndkey){
  * @data: Pointer to the data to be encrypted
  * @size: Size of the data to be encrypted
  * @key: Decryption key
- * @pt: Uninitialized pointer to store the decrypted plaintext
+ * @pt: Uninitialized pointer to store the decrypted plaintext (TODO: Must be freed by the caller)
  */
 int feistel_decrypt(unsigned char *data, size_t size, unsigned char *key, unsigned char **plaintext ) {
         int r, ret = 0, num_blocks = 0;
@@ -117,7 +118,7 @@ error:
  * @data: Pointer to the data to be encrypted
  * @size: Size of the data to be encrypted
  * @key: Pointer to the buffer storing the encryption key
- * @ct: Uninitialized pointer to return the buffer holding the ciphertext
+ * @ct: Uninitialized pointer to return the buffer holding the ciphertext (TODO: Must be greed by the caller)
  */
 int feistel_encrypt(unsigned char *data, size_t size, unsigned char *key, unsigned char **ciphertext) {
         
