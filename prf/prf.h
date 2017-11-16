@@ -1,6 +1,12 @@
 #include <openssl/sha.h>
+#include <openssl/err.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#include <openssl/bio.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <openssl/bn.h>
+#include <errno.h>
 #include <string.h>
 
 #define min(a,b) ((a) < (b) ? (a) : (b))
