@@ -1,3 +1,4 @@
+#include "prf.h"
 /*
  * generate_auth_key(): Generates authentication key from the master session key
  * @master: Pointer to the buffer containing the master key
