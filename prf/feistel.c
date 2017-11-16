@@ -54,7 +54,7 @@ void get_round_key(unsigned char *key,  int rnd, unsigned char *rndkey){
  * @pt: Uninitialized pointer to store the decrypted plaintext (TODO: Must be freed by the caller)
  */
 int feistel_decrypt(unsigned char *data, size_t size, unsigned char *key, unsigned char **plaintext ) {
-        int r, ret = 0, num_blocks = 0;
+        int r, ret = 0;
         unsigned char *curr, *index;
         
         if(data == NULL) {
@@ -66,8 +66,7 @@ int feistel_decrypt(unsigned char *data, size_t size, unsigned char *key, unsign
                 printf("feistel_decrypt()::Invalid ciphertext\n");
                 return -1;
         }
-        
-        num_blocks = (size/BLOCK_SIZE);
+
         *plaintext =  (unsigned char *)calloc(size, sizeof(unsigned char));
         curr = *plaintext;
         index = data;
@@ -87,17 +86,8 @@ int feistel_decrypt(unsigned char *data, size_t size, unsigned char *key, unsign
                         unsigned char rndkey[KEY_SIZE], digest[SHA256_DIGEST_LENGTH], *tmp;
                         
                         get_round_key(key, NUM_FEISTEL_ROUNDS - r - 1, rndkey);
-                        if(!rndkey){
-                                printf("feistel_decrypt()::Error in generating round key\n");
-                                ret = -1;
-                                goto error;
-                        }
-                        
+
                         calc_secure_hash(right, (BLOCK_SIZE/2), digest, rndkey);
-                        if(!digest){
-                                ret = -1;
-                                goto error;
-                        }
                         
                         for(i = 0; i < (BLOCK_SIZE/2); i++){
                                 left[i] ^= digest[i]; 
@@ -109,7 +99,7 @@ int feistel_decrypt(unsigned char *data, size_t size, unsigned char *key, unsign
                 ret += BLOCK_SIZE;
                 curr += BLOCK_SIZE;
         }
-error:
+
         return ret;
 }
 
@@ -161,19 +151,9 @@ int feistel_encrypt(unsigned char *data, size_t size, unsigned char *key, unsign
                         unsigned char rndkey[KEY_SIZE], digest[SHA256_DIGEST_LENGTH], *tmp;
             
                         get_round_key(key, r, rndkey);
-  
-                        if(!rndkey){
-                                printf("feistel_encrypt()::Error in generating round key\n");
-                                ret = -1;
-                                goto error;
-                        }
                         
                         calc_secure_hash(right, BLOCK_SIZE/2, digest, rndkey);
-                        if(digest == NULL){
-                                ret = -1;
-                                goto error;
-                        }
-
+                        
                         for(i = 0; i < (BLOCK_SIZE/2); i++){
                                 left[i] ^= digest[i]; 
                         }
@@ -185,6 +165,5 @@ int feistel_encrypt(unsigned char *data, size_t size, unsigned char *key, unsign
                 ret += BLOCK_SIZE;
                 curr += BLOCK_SIZE;
         }
-error:
         return ret;  
 }
