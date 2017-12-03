@@ -20,7 +20,7 @@
 extern int feistel_decrypt(unsigned char *data, size_t size, unsigned char *key, unsigned char **plaintext );
 extern int feistel_encrypt(unsigned char *data, size_t size, unsigned char *key, unsigned char **ciphertext);
 
-void encrypt_ctr(unsigned char in[], size_t in_len, unsigned char **output, unsigned char key[], unsigned char iv[]);
+void encrypt_ctr(unsigned char in[], size_t in_len, unsigned char out[], unsigned char key[], unsigned char iv[]);
 void decrypt_ctr( unsigned char in[], size_t in_len, unsigned char out[],  unsigned char key[],  unsigned char iv[]);
 
 extern int generate_auth_key(unsigned char *master, unsigned char **auth_key);

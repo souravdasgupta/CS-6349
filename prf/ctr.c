@@ -45,6 +45,6 @@ void encrypt_ctr(unsigned char in[], size_t in_len, unsigned char out[], unsigne
 
 void decrypt_ctr( unsigned char in[], size_t in_len, unsigned char out[],  unsigned char key[],  unsigned char iv[]) {
 	// CTR encryption is its own inverse function.
-	aes_encrypt_ctr(in, in_len, out, key, iv);
+	encrypt_ctr(in, in_len, out, key, iv);
 }
  
