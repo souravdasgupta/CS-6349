@@ -20,7 +20,7 @@ void increment_iv(unsigned char iv[], int counter_size) {
 
 // Performs the encryption in-place, the input and output buffers may be the same.
 // Input may be an arbitrary length (in bytes).
-void aes_encrypt_ctr(unsigned char in[], size_t in_len, unsigned char out[], unsigned char key[], unsigned char iv[]) {
+void encrypt_ctr(unsigned char in[], size_t in_len, unsigned char out[], unsigned char key[], unsigned char iv[]) {
         size_t idx = 0, last_block_length, sz;
         unsigned char iv_buf[BLOCK_SIZE], *out_buf;
 
@@ -43,7 +43,7 @@ void aes_encrypt_ctr(unsigned char in[], size_t in_len, unsigned char out[], uns
         xor_buf(out_buf, &out[idx], in_len - idx);   // Use the Most Significant bytes.
 }
 
-void aes_decrypt_ctr( unsigned char in[], size_t in_len, unsigned char out[],  unsigned char key[],  unsigned char iv[]) {
+void decrypt_ctr( unsigned char in[], size_t in_len, unsigned char out[],  unsigned char key[],  unsigned char iv[]) {
 	// CTR encryption is its own inverse function.
 	aes_encrypt_ctr(in, in_len, out, key, iv);
 }

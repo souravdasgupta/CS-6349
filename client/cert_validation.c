@@ -4,10 +4,12 @@
 #include <openssl/x509.h>
 #include <openssl/x509_vfy.h>
 
+#include "client.h"
+
 /*
  * Validates the chain of certificate and returns the validation result
  * @ca_path: The path of the crt file for the CA
- * @cert_path: Path of the cerificate(.crt) file of the principal 
+ * @cert_path: Path of the cerificate(.crt) file of the server 
  */
 int validate_certificate(const char ca_path[], const char cert_path[]) {
         
