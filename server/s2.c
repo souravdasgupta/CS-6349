@@ -13,7 +13,7 @@
 #include <sys/sendfile.h>
 #include <sys/stat.h>
 #include <stdbool.h>
-#include "prf.h"
+#include "../prf/prf.h"
 
 
 #define PORT "6666"  // the port users will be connecting to
@@ -78,7 +78,7 @@ unsigned char *integrity_key=NULL;
     int yes=1;
     char s[INET6_ADDRSTRLEN];
     int rv,numbytes;
-        int sz, sd;
+int sz, sd;
 
 
     memset(&hints, 0, sizeof hints);
@@ -165,7 +165,7 @@ int i;
 FILE *f, *r;
 int counter;
 unsigned char replybuf[sizeof(struct header)];
-unsigned char sendbuf[sizeof(struct header) + 8192 +BLOCK_SIZE];
+unsigned char sendbuf[sizeof(struct header) + 8192 +64];
 struct header rep_header;
 
 //--------------------------------------Certificate--------------------------------------------//
@@ -399,7 +399,7 @@ printf("%d",digest[i]);
 
 if(!RAND_bytes(iv, BLOCK_SIZE)){
                 printf("Error in generating IV");
-}
+        }
 memcpy(sendbuf,iv,BLOCK_SIZE);
 memcpy(sendbuf+BLOCK_SIZE,digest,DIGEST_SIZE); 
 
@@ -532,50 +532,39 @@ int sp=0;
 
 counter=0;
 
-r = NULL;
-r=fopen(req_header.name,"w+");
-if(!r) {
-        perror("server::fopen()::");
-}
+r=fopen(req_header.name,"w+");//open file to append
+
 while (sz>0){
-        
-        printf("Getting new Block\n");
-        memset(sendbuf, 0, sizeof(struct header) + 8192 + BLOCK_SIZE);
- 
-        numbytes = recv(new_fd, sendbuf, sizeof(struct header) + 8192 + BLOCK_SIZE, MSG_WAITALL);
-        if(numbytes < 0){
-                perror("server::");
-                return -1;
-        }
-        printf("Received Bytes if socket is: %ld\n", numbytes- sizeof(struct header)-BLOCK_SIZE);
-	memcpy(iv, sendbuf, BLOCK_SIZE);//Extract IV
 
-        decrypt_ctr( sendbuf+BLOCK_SIZE, sizeof(struct header) + 8192 , sendbuf+BLOCK_SIZE,  integrity_key, iv) ;
-        
-        if((numbytes- sizeof(struct header)-BLOCK_SIZE) != file_header.Payload) {
-                printf("Last Block\n");
-        }
-	memcpy(&file_header, sendbuf+BLOCK_SIZE, sizeof(struct header));//Extract Header
-	//open file to append
-         printf("open file to append: %ld\n", file_header.Payload);
-	sd=fwrite(sendbuf+sizeof(struct header)+BLOCK_SIZE, sizeof(unsigned char) ,  file_header.Payload, r);
+	if ((numbytes = recv(new_fd, sendbuf, sizeof(struct header) + 8192 + BLOCK_SIZE, MSG_WAITALL)) == -1) 
+        perror("recv");
 
-	 printf("written \n");
+	memcpy(iv,sendbuf,BLOCK_SIZE);//Extract IV
+
+
+        decrypt_ctr( sendbuf+BLOCK_SIZE, sizeof(struct header) + 8192 , sendbuf+BLOCK_SIZE, integrity_key, iv) ;
+
+	memcpy(&file_header,sendbuf+BLOCK_SIZE,sizeof(struct header));//Extract Header
+
+	
+	sd=fwrite(sendbuf+sizeof(struct header)+BLOCK_SIZE,1,file_header.Payload,r);
+	counter=0;//Reset counter for next block
 	sp=sp + sd;
 	sz=sz-sd;//size from request header
 	printf("\nBytes written this time:%d\nTotal bytes written:%d\nGot Block %d\n",sd,sp,file_header.block);
 
-       
+
 //Send Ack
 	rep_header.opcode=4;
 	memcpy(replybuf,&rep_header,sizeof(struct header));//Build repply packet
 	if (send(new_fd,replybuf,sizeof(struct header), 0) == -1)
-                perror("send");
-        printf("Done sending ACK\n");
+        perror("send");
+
+
 
 }
 
-fclose(r);
+
 
 
 
@@ -593,7 +582,7 @@ fclose(r);
  
 //--------------------------------------Hash--------------------------------------------//
 
-
+fclose(r);
 
 unsigned char digest[DIGEST_SIZE];
 unsigned char rdigest[DIGEST_SIZE];
@@ -644,7 +633,7 @@ else
 	memcpy(replybuf,&rep_header,sizeof(struct header));//Build repply packet
 	if (send(new_fd,replybuf,sizeof(struct header), 0) == -1)
         perror("send");
-        printf("\nIncorrect file received\n");
+printf("\nIncorrect file received\n");
 remove(req_header.name);
 }
 //--------------------------------------Hash Ends--------------------------------------------//
